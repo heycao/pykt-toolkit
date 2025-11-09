@@ -16,6 +16,29 @@ os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 device = "cpu" if not torch.cuda.is_available() else "cuda"
 os.environ['CUBLAS_WORKSPACE_CONFIG']=':4096:2'
 
+def to_device(data, device):
+    """Move tensor(s) to chosen device"""
+    if isinstance(data, (list,tuple)):
+        return [to_device(x, device) for x in data]
+    if isinstance(data, dict):
+        return {k: to_device(v, device) for k, v in data.items()}
+    return data.to(device, non_blocking=True)
+
+class DeviceDataLoader:
+    """Wrap a dataloader to move data to a device"""
+    def __init__(self, dl, device):
+        self.dl = dl
+        self.device = device
+        
+    def __iter__(self):
+        """Yield a batch of data after moving it to device"""
+        for b in self.dl: 
+            yield to_device(b, self.device)
+
+    def __len__(self):
+        """Number of batches"""
+        return len(self.dl)
+
 def save_config(train_config, model_config, data_config, params, save_dir):
     d = {"train_config": train_config, 'model_config': model_config, "data_config": data_config, "params": params}
     save_path = os.path.join(save_dir, "config.json")
@@ -74,6 +97,9 @@ def main(params):
     else:
         diff_level = params["difficult_levels"]
         train_loader, valid_loader, *_ = init_dataset4train(dataset_name, model_name, data_config, fold, batch_size, diff_level=diff_level)
+
+    train_loader = DeviceDataLoader(train_loader, device)
+    valid_loader = DeviceDataLoader(valid_loader, device)
 
     params_str = "_".join([str(v) for k,v in params.items() if not k in ['other_config']])
 
