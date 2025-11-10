@@ -215,7 +215,7 @@ def model_forward(model, data, rel=None):
         y = model(c.long(), r.long(), cshft.long())
         ys.append(y)
     elif model_name in ["saint"]:
-        y = model(cq.long(), cc.long(), r.long())
+        y, _ = model(cq.long(), cc.long(), r.long())
         ys.append(y[:, 1:])
     elif model_name in ["akt","extrakt","folibikt", "robustkt", "akt_vector", "akt_norasch", "akt_mono", "akt_attn", "aktattn_pos", "aktmono_pos", "akt_raschx", "akt_raschy", "aktvec_raschx", "lefokt_akt", "fluckt"]:               
         y, reg_loss = model(cc.long(), cr.long(), cq.long())

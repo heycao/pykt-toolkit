@@ -112,7 +112,7 @@ def evaluate(model, test_loader, model_name, rel=None, save_path=""):
             elif model_name in ["kqn", "sakt"]:
                 y = model(c.long(), r.long(), cshft.long())
             elif model_name == "saint":
-                y = model(cq.long(), cc.long(), r.long())
+                y, _ = model(cq.long(), cc.long(), r.long())
                 y = y[:, 1:]
             elif model_name in ["akt","extrakt","folibikt", "robustkt", "akt_vector", "akt_norasch", "akt_mono", "akt_attn", "aktattn_pos", "aktmono_pos", "akt_raschx", "akt_raschy", "aktvec_raschx", "lefokt_akt", "fluckt"]:                                
                 y, reg_loss = model(cc.long(), cr.long(), cq.long())
@@ -1420,4 +1420,3 @@ def save_currow_question_res(idx, dcres, dqres, qidxs, ctrues, cpreds, uid, fout
         late_mean, late_vote, late_all = save_each_question_res(dcres, dqres, ctrues, cpreds)
         # print("\t".join([str(idx), str(uid), str(qidx), str(late_mean), str(late_vote), str(late_all)]))
         fout.write("\t".join([str(idx), str(uid), str(qidx), str(late_mean), str(late_vote), str(late_all)]) + "\n")
-

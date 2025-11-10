@@ -63,10 +63,7 @@ class SAINT(nn.Module):
 
         res = self.out(self.dropout(in_res))
         res = torch.sigmoid(res).squeeze(-1)
-        if not qtest:
-            return res
-        else:
-            return res, in_res
+        return res, in_res
 
 
 class Encoder_block(nn.Module):
