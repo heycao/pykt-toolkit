@@ -30,15 +30,8 @@ class QDKTNet(nn.Module):
         h, _ = self.lstm_layer(xemb)
         h = self.dropout_layer(h)
         y = self.out_layer(h)
-        mastery_vector = torch.sigmoid(y)
-        
-        if data is not None and 'qshft' in data:
-            y = (mastery_vector * F.one_hot(data['qshft'].long(), self.num_q)).sum(-1)
-        else:
-            y = mastery_vector
-            
-        outputs = {"y": y, "mastery_vector": mastery_vector}
-        return outputs
+        y = (torch.sigmoid(y) * F.one_hot(data['qshft'].long(), self.num_q)).sum(-1)
+        return {"y": y, "h": h}
 
 class QDKT(QueBaseModel):
     def __init__(self, num_q,num_c, emb_size, dropout=0.1, emb_type='qaid', emb_path="", pretrain_dim=768,device='cpu',seed=0,mlp_layer_num=1,other_config={},**kwargs):
