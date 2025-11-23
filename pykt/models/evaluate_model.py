@@ -139,6 +139,9 @@ def evaluate(model, test_loader, model_name, rel=None, save_path=""):
                 y = model(cc.long(), cq.long(), ct.long(), cr.long())#, csm.long())
                 y = y[:, 1:]
             elif model_name in que_type_models and model_name not in ["lpkt", "promptkt"]:
+                for k, v in data.items():
+                    if hasattr(v, "to"):
+                        data[k] = v.to(device)
                 y = model.predict_one_step(data)
                 c,cshft = q,qshft#question level 
             elif model_name in ["promptkt"]:
